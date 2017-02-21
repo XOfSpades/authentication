@@ -1,0 +1,11 @@
+*.md
+*.sh
+.gitignore
+.git
+/tarballs
+/_build
+/deps
+/apps/**/*.md
+/apps/**/.gitignore
+/apps/**/deps
+/apps/**/_build

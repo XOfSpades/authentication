@@ -1,0 +1,34 @@
+FROM bitwalker/alpine-elixir:1.4.0
+
+MAINTAINER bernhard.stoecker@recogizer.de
+
+RUN apk add --update bash && rm -rf /var/cache/apk/*
+
+EXPOSE 8080
+
+RUN mix local.hex --force && \
+    mix local.rebar --force
+
+RUN mkdir /meta_folders
+
+WORKDIR /meta_folders
+
+RUN mkdir /meta_folders/_build
+RUN mkdir -p /meta_folders/config
+RUN mkdir /meta_folders/lib
+
+COPY mix.exs /meta_folders/mix.exs
+COPY mix.lock /meta_folders/mix.lock
+
+RUN MIX_ENV=test mix do deps.get, deps.compile
+
+COPY config/config.exs /meta_folders/config/config.exs
+COPY config/test.exs /meta_folders/config/test.exs
+
+COPY priv /meta_folders/priv
+
+COPY lib /meta_folders/lib
+COPY web /meta_folders/web
+COPY test /meta_folders/test
+
+RUN MIX_ENV=test mix compile

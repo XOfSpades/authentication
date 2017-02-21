@@ -1,0 +1,76 @@
+version: '2'
+services:
+
+################################################################################
+################################## databases ###################################
+################################################################################
+
+  authentication-postgres-s:
+    image: postgres:9.6.2
+    container_name: authentications-postgres-c
+    env_file:
+      - ./env_lists/env.list
+    volumes:
+      - authentication-postgres-data-v:/var/lib/postgresql/data
+    networks:
+      - "authentication-n"
+
+################################################################################
+######################### single dev or prod container #########################
+################################################################################
+
+  authentication-s:
+    image: xofspades/authentications:dev0.0.1
+    container_name: authentication-dev-c
+    build:
+      context: .
+      args:
+        - mix_env=dev
+    command: mix do ecto.create, ecto.migrate, phoenix.server
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./resources:/resources
+      - .:/app
+    depends_on:
+      - authentication-postgres-s
+    networks:
+      - "authentication-n"
+
+################################################################################
+########################## test related containers #############################
+################################################################################
+
+  authentication-postgres-s:
+    image: postgres:9.5.5
+    container_name: authentication-postgres-c
+    env_file:
+      - ./env_lists/env.list
+    volumes:
+      - authentication-postgres-data-test-v:/var/lib/postgresql/data
+    networks:
+      - "authentication-n"
+
+  authentication-test-s:
+    image: xofspades/authentication-test-s:test0.0.1
+    container_name: authentication-dim-test-c
+    build:
+      dockerfile: Dockerfile-test
+      context: .
+    command: mix do ecto.create, ecto.migrate, test
+    environment:
+      - MIX_ENV=test
+    volumes:
+      - ./resources:/resources
+      - .:/app
+    depends_on:
+      - authentication-postgres-s
+    networks:
+      - "authentication-n"
+
+volumes:
+  authentication-postgres-data-v :
+  authentication-postgres-data-test-v :
+
+networks:
+  authentication-n:
