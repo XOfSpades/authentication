@@ -19,7 +19,7 @@ defmodule Authentication.Mixfile do
     [
       mod: {Authentication, []},
       applications: [
-        :phoenix, :phoenix_pubsub, :cowboy, :logger, :ecto, :postgrex
+        :phoenix, :phoenix_pubsub, :cowboy, :logger
       ]
     ]
   end
@@ -34,8 +34,9 @@ defmodule Authentication.Mixfile do
   defp deps do
     [{:phoenix, "~> 1.2.1"},
      {:phoenix_pubsub, "~> 1.0"},
-     {:ecto, "~> 2.1.3"},
-     {:postgrex, ">= 0.13.0"},
+     {:joken, "~> 1.4.1"},
+     {:poison, "~> 2.2.0"},
+     {:json_web_token, "~> 0.2"},
      {:cowboy, "~> 1.0"}]
   end
 end
